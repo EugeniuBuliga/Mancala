@@ -1,10 +1,10 @@
 import pygame
-from game.options import *
+from components.options import *
 
 
 def init_game():
     """
-    Initializes the main game components.
+    Initializes the main components components.
     :return: display window object
     """
     pygame.init()

@@ -1,6 +1,6 @@
 import pygame.draw
 
-from game.options import *
+from components.options import *
 
 
 class Piece:

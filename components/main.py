@@ -1,10 +1,10 @@
 import sys, pygame
 from math import sqrt, log, exp
 
-from game.board import Board
-from game.graphics import set_text
-from game.initialization import init_game
-from game.piece import Piece
+from components.board import Board
+from components.graphics import set_text
+from components.initialization import init_game
+from components.piece import Piece
 from options import *
 
 if __name__ == '__main__':
