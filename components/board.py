@@ -18,40 +18,52 @@ class Board:
         message += "]"
         return message
 
-    def init_board(self):
+    def init_board(self, screen):
         """
         Initializes main Board class components.
         """
-        storage1 = Cell(True, "left")
+        storage1 = Cell(screen, True, "left")
         self.cells.append(storage1)
 
-        storage2 = Cell(True, "right")
+        storage2 = Cell(screen, True, "right")
         self.cells.append(storage2)
 
         upper_row = []
         for i in range(6):
-            upper_row.append(Cell(False, "upper"))
+            upper_row.append(Cell(screen, False, "upper", str(i)))
         self.cells.append(upper_row)
 
         lower_row = []
         for i in range(6):
-            lower_row.append(Cell(False, "lower"))
+            lower_row.append(Cell(screen, False, "lower", str(i)))
         self.cells.append(lower_row)
 
-    def draw_board(self, screen):
+    def draw_board(self):
         """
         Draws all board elements on the screen.
         :param screen: The screen upon which to draw.
         """
-        self.cells[0].draw_cell(screen)
-        self.cells[1].draw_cell(screen)
+        self.cells[0].draw_cell()
+        self.cells[1].draw_cell()
 
         i = 0
         for cell in self.cells[2]:
-            cell.draw_cell(screen, str(i))
+            cell.draw_cell()
             i += 1
 
         i = 0
         for cell in self.cells[3]:
-            cell.draw_cell(screen, str(i))
+            cell.draw_cell()
             i += 1
+
+        for i in [2, 3]:
+            for piece in self.cells[i]:
+                piece.draw_pieces()
+
+
+    def add_pieces(self):
+        for i in [2,3]:
+            for j in range(0,6):
+                self.cells[i][j].add_pieces_forced(4)
+
+
