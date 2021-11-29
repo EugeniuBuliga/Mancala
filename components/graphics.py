@@ -1,7 +1,9 @@
 import pygame
 
+from components.options import *
 
-def set_text(string,color, *center ):
+
+def set_text(string, color, *center):
     """
     Write a text on given coordinates.
 

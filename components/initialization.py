@@ -9,7 +9,7 @@ def init_game():
     """
     pygame.init()
     size = WIDTH, HEIGHT
-    window = pygame.display.set_mode(size)
+    window = pygame.display.set_mode(size, pygame.RESIZABLE)
     pygame.display.set_caption("Mancala")
 
     return window

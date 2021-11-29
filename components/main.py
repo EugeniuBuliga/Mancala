@@ -13,8 +13,9 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     run = True
     board = Board()
+    board.init_board()
     i = 0
-    piece = Piece()
+    piece = Piece(1)
 
     while run:
 
