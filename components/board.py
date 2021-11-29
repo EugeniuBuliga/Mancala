@@ -57,13 +57,13 @@ class Board:
             i += 1
 
         for i in [2, 3]:
-            for piece in self.cells[i]:
-                piece.draw_pieces()
+            for cell in self.cells[i]:
+                cell.draw_pieces()
 
+        for i in [0, 1]:
+            self.cells[i].draw_pieces()
 
     def add_pieces(self):
-        for i in [2,3]:
-            for j in range(0,6):
+        for i in [2, 3]:
+            for j in range(0, 6):
                 self.cells[i][j].add_pieces_forced(4)
-
-

@@ -10,11 +10,22 @@ class Cell:
         self.order = order
         self.screen = screen
         self.contains = []
+
         self.x = CELL_PADDING + CELL_WIDTH * int(order)
-        if self.cell_type == "upper":
-            self.y = BORDER_UPPER
+        self.y = BORDER_UPPER
+
+        if self.is_storage:
+            if self.cell_type == "left":
+                self.x = BORDER_SIDE
+            else:
+                self.x = WIDTH - STORAGE_WIDTH - BORDER_SIDE
         else:
-            self.y = BORDER_UPPER + CELL_HEIGHT
+            if self.cell_type == "upper":
+                self.y = BORDER_UPPER
+            else:
+                self.y = BORDER_UPPER + CELL_HEIGHT
+
+        self.is_selected = False
 
     def __str__(self):
         # ################try lambda expression here later
@@ -33,6 +44,13 @@ class Cell:
         """
 
         # determine whether cell is a normal cell or a storage
+        if self.is_selected:
+            border_color = SELECTED_BORDER_COLOR
+            cell_border_width = CELL_BORDER_WIDTH * 3
+        else:
+            border_color = BORDER_COLOR
+            cell_border_width = CELL_BORDER_WIDTH
+
         if not self.is_storage:
 
             # draw the border rectangle
@@ -41,24 +59,19 @@ class Cell:
                       CELL_WIDTH,
                       CELL_HEIGHT)
 
-            pygame.draw.rect(self.screen, BORDER_COLOR, border)
+            pygame.draw.rect(self.screen, border_color, border)
 
             # draw the rectangle itself
-            cell = (self.x + CELL_BORDER_WIDTH,
-                    self.y + CELL_BORDER_WIDTH,
-                    CELL_WIDTH - 2 * CELL_BORDER_WIDTH,
-                    CELL_HEIGHT - 2 * CELL_BORDER_WIDTH)
+            cell = (self.x + cell_border_width,
+                    self.y + cell_border_width,
+                    CELL_WIDTH - 2 * cell_border_width,
+                    CELL_HEIGHT - 2 * cell_border_width)
 
             pygame.draw.rect(self.screen, CELL_COLOR, cell)
         else:
-            # set position of the storage
-            if self.cell_type == "left":
-                padding = BORDER_SIDE
-            else:
-                padding = WIDTH - STORAGE_WIDTH - BORDER_SIDE
 
             # draw the border rectangle
-            border = (padding,
+            border = (self.x,
                       BORDER_UPPER,
                       STORAGE_WIDTH,
                       STORAGE_HEIGHT)
@@ -67,18 +80,20 @@ class Cell:
 
             # draw the rectangle itself
 
-            cell = (padding + CELL_BORDER_WIDTH,
+            cell = (self.x + CELL_BORDER_WIDTH,
                     BORDER_UPPER + CELL_BORDER_WIDTH,
                     STORAGE_WIDTH - 2 * CELL_BORDER_WIDTH,
                     STORAGE_HEIGHT - 2 * CELL_BORDER_WIDTH)
 
             pygame.draw.rect(self.screen, CELL_COLOR, cell)
 
-    def add_piece(self, piece):
-        self.contains.append(piece)
+    # def add_piece(self, piece):
+    #     self.contains.append(piece)
 
-    def remove_piece(self, piece):
-        self.contains.remove(piece)
+    def remove_piece(self):
+        # self.contains.remove(piece)
+        if self.contains:
+            self.contains.pop()
 
     def draw_pieces(self):
         x = self.x
@@ -99,3 +114,11 @@ class Cell:
         for i in range(nr):
             piece = Piece()
             self.contains.append(piece)
+
+    def is_mouse_on_piece(self, x, y):
+        if self.x <= x <= self.x + CELL_WIDTH and self.y <= y <= self.y + CELL_HEIGHT:
+            self.is_selected = True
+            return True
+        else:
+            self.is_selected = False
+            return False
