@@ -46,7 +46,7 @@ class Cell:
     def __str__(self):
         func1 = (lambda x: "Storage" if x else "Cell")
         func2 = (lambda x: self.order if not x else "S")
-        message = func1(self.is_storage) + "<" + self.cell_type + "-" + func2(self.is_storage)+">,"
+        message = func1(self.is_storage) + "<" + self.cell_type + "-" + func2(self.is_storage) + ">,"
         return message
 
     def draw_cell(self):
@@ -91,8 +91,17 @@ class Cell:
             pygame.draw.rect(self.screen, CELL_COLOR, cell)
 
     def remove_piece(self):
+        """
+        Removes one piece from this cell's inventory.
+
+        :return: True if the function really did remove a piece. False if removing a piece is impossible (no more pieces
+         on the cell).
+        """
         if self.inventory:
             self.inventory.pop()
+            return True
+        else:
+            return False
 
     def draw_inventory(self):
         """
@@ -106,7 +115,9 @@ class Cell:
         for piece in self.inventory:
             piece.draw_piece(x + pad * i, y + pad * j)
 
-            if i < 3:
+            if i < 3 and not self.is_storage:
+                i += 1
+            elif i < 5 and self.is_storage:
                 i += 1
             else:
                 i = 1
