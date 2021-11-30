@@ -9,7 +9,7 @@ class Logic:
         self.active_player = board.players[0]
         self.move_made = False
         self.ended_move_on_piece = False
-        self.hint1 = self.active_player.name + " start the game"
+        self.hint1 = self.active_player.name + "'s turn"
         self.hint2 = ""
         self.last_cell = board.cells[0]
         self.ended = False
@@ -147,8 +147,12 @@ class Logic:
 
             self.board.cells[i][j].remove_piece()
             self.move_made = True
-        if actual_i == 0 or actual_i == 1:
+        if actual_i == 0 == self.active_player.get_storage() or actual_i == 1 == self.active_player.get_storage():
+            print(self.active_player.get_storage())
             self.ended_move_on_piece = True
+            self.last_cell = self.board.cells[actual_i]
+        elif actual_i == 0 or actual_i == 1:
+            print(self.active_player.get_storage())
             self.last_cell = self.board.cells[actual_i]
         else:
             self.last_cell = self.board.cells[actual_i][actual_j]

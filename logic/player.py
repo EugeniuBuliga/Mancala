@@ -4,6 +4,7 @@ class Player:
         self.name = name
         self.orientation = orientation
 
+        self.storage_num = -1
         self.storage, self.allowed = self.get_allowed_cells()
 
     def __str__(self):
@@ -11,6 +12,9 @@ class Player:
 
     def __repr__(self):
         return self.__str__()
+
+    def get_storage(self):
+        return self.storage_num
 
     def get_allowed_cells(self):
         """
@@ -21,7 +25,9 @@ class Player:
         if self.orientation == "up":
             allowed = self.board.cells[2]
             storage = self.board.cells[0]
+            self.storage_num = 0
         else:
             allowed = self.board.cells[3]
             storage = self.board.cells[1]
+            self.storage_num = 1
         return storage, allowed
