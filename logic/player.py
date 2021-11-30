@@ -13,11 +13,15 @@ class Player:
         return self.__str__()
 
     def get_allowed_cells(self):
+        """
+        Sets the list of cells upon which the player can click, plus the respective storage.
+
+        :return: player's piece storage, cells allowed to click
+        """
         if self.orientation == "up":
             allowed = self.board.cells[2]
             storage = self.board.cells[0]
         else:
             allowed = self.board.cells[3]
             storage = self.board.cells[1]
-        # print(self.name,"allowed to move on", allowed, "stores in", storage)
         return storage, allowed

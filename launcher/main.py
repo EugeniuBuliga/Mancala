@@ -1,6 +1,6 @@
 from math import sqrt
 from components.board import *
-from components.graphics import draw_text, draw_score, draw_players
+from components.graphics import draw_text, draw_score, draw_players, draw_hint
 from components.initialization import init_game, init_board
 from components.options import *
 from logic.logic import Logic
@@ -28,11 +28,11 @@ if __name__ == '__main__':
                     logic.next_player()
                     logic.move_made = False
 
-
         # graphics
         pygame.draw.rect(window, BACKGROUND_COLOR, (0, 0, WIDTH, HEIGHT))
         board.draw_board()
         draw_players(window, board)
         draw_score(window, board)
+        draw_hint(window, logic)
         pygame.display.update()
     pygame.quit()

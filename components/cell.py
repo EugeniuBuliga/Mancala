@@ -17,6 +17,12 @@ class Cell:
         self.border_color, self.cell_border_width = self.set_colors_and_borders()
 
     def set_x_and_y(self):
+        """
+        Sets cells x and y coordinates based on its type.
+
+        :return: x and y coordinates of the cell
+        """
+
         if self.is_storage:
             y = BORDER_UPPER
             if self.cell_type == "left":
@@ -33,8 +39,11 @@ class Cell:
 
     def set_colors_and_borders(self):
         """
-        Set the colors and thickness of the borders based on the fact that cell is selected or not.
+        Set the colors and thickness of the borders, based on the fact that cell is selected or not.
+
+        :return: border_color and cell_border_color
         """
+
         if self.is_selected:
             border_color = SELECTED_BORDER_COLOR
             cell_border_width = CELL_BORDER_WIDTH * 3
@@ -54,7 +63,7 @@ class Cell:
 
     def draw_cell(self):
         """
-        Draw a specific cell or storage on the right place on the screen.
+        Draw a specific cell or storage on the appropriate place on the screen.
         """
 
         self.border_color, self.cell_border_width = self.set_colors_and_borders()
@@ -128,7 +137,7 @@ class Cell:
 
     def add_n_pieces(self, n):
         """
-        Adds to a cells inventory the nr amount of pieces.
+        Adds to a cell's inventory the n amount of pieces.
 
         :param n: Amount of pieces.
         """

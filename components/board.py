@@ -24,9 +24,12 @@ class Board:
         return message
 
     def add_default_players(self):
-        player1 = Player(self, "Player1", "up")
+        """
+        Initializes players.
+        """
+        player1 = Player(self, "Player1", "down")
         self.players.append(player1)
-        player2 = Player(self, "Player2", "down")
+        player2 = Player(self, "Player2", "up")
         self.players.append(player2)
 
     def init_board(self):
