@@ -159,3 +159,9 @@ class Cell:
         else:
             self.is_selected = False
             return False
+
+    def is_empty(self):
+        if self.inventory:
+            return False
+        else:
+            return True

@@ -40,8 +40,8 @@ def draw_players(screen, board):
     :param screen: Screen open which to draw the text.
     :param board: Game board, to extract the players from.
     """
-    draw_text(screen, SCORE_TEXT_COLOR, board.players[0].name, PLAYER1_POS)
-    draw_text(screen, SCORE_TEXT_COLOR, board.players[1].name, PLAYER2_POS)
+    draw_text(screen, SCORE_TEXT_COLOR, board.players[1].name, PLAYER1_POS)
+    draw_text(screen, SCORE_TEXT_COLOR, board.players[0].name, PLAYER2_POS)
 
 
 def draw_hint(screen, logic):

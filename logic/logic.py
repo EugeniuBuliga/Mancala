@@ -10,6 +10,7 @@ class Logic:
         self.hint1 = self.active_player.name + " start the game"
         self.hint2 = ""
         self.last_cell = board.cells[0]
+        self.ended = False
 
     def movement_logic(self):
         """
@@ -23,12 +24,35 @@ class Logic:
                         self.make_move(i, j)
                         if not self.capture():
                             self.hint2 = ""
+                self.check_win_state(i)
+
+    def check_win_state(self, i):
+        empty_nr = 0
+        for j in range(0, 6):
+            if self.board.cells[i][j].is_empty():
+                empty_nr += 1
+
+        if empty_nr == 6:
+            winner = self.get_winner()
+            if winner != "both":
+                self.hint2 = "Game ended: " + winner.name + " won!"
+            else:
+                self.hint2 = "Game ended: " + "Ended in a draw!"
+            self.ended = True
+
+    def get_winner(self):
+        if len(self.board.players[0].storage.inventory) > len(self.board.players[1].storage.inventory):
+            return self.board.players[0]
+        elif len(self.board.players[0].storage.inventory) < len(self.board.players[1].storage.inventory):
+            return self.board.players[1]
+        else:
+            return "both"
 
     def capture(self):
         if len(self.last_cell.inventory) == 1 and not self.last_cell.is_storage:
-            self.transfer_pieces(self.opposite_cell(self.last_cell), self.active_player.storage)
-            self.hint2 = self.active_player.name + " captured opponent's pieces"
-            return True
+            if self.transfer_pieces(self.opposite_cell(self.last_cell), self.active_player.storage):
+                self.hint2 = self.active_player.name + " captured opponent's pieces"
+                return True
         return False
 
     def opposite_cell(self, cell):
@@ -40,9 +64,13 @@ class Logic:
 
     @staticmethod
     def transfer_pieces(cell1, cell2):
-        while cell1.inventory:
-            cell2.add_n_pieces(1)
-            cell1.remove_piece()
+        if cell1.inventory:
+            while cell1.inventory:
+                cell2.add_n_pieces(1)
+                cell1.remove_piece()
+            return True
+        else:
+            return False
 
     @staticmethod
     def next_in_order(i, j):
