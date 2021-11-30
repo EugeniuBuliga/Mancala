@@ -1,6 +1,6 @@
-from math import sqrt
+import pygame
 from components.board import *
-from components.graphics import draw_text, draw_score, draw_players, draw_hint
+from components.graphics import draw_score, draw_players, draw_hint
 from components.initialization import init_game, init_board
 from components.options import *
 from logic.logic import Logic

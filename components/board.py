@@ -1,5 +1,3 @@
-import pygame
-
 from logic.player import Player
 from .cell import Cell
 from .options import *

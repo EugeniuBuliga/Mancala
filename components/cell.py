@@ -161,6 +161,11 @@ class Cell:
             return False
 
     def is_empty(self):
+        """
+        Check if cell has no pieces.
+
+        :return: True if there are no pieces. False if there still is something on the cell.
+        """
         if self.inventory:
             return False
         else:

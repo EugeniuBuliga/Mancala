@@ -1,3 +1,5 @@
+from time import sleep
+
 import pygame
 
 
@@ -27,6 +29,11 @@ class Logic:
                 self.check_win_state(i)
 
     def check_win_state(self, i):
+        """
+        Checks if the game was won and sends the print message to 'hint2'.
+
+        :param i: check win state of i row
+        """
         empty_nr = 0
         for j in range(0, 6):
             if self.board.cells[i][j].is_empty():
@@ -41,6 +48,11 @@ class Logic:
             self.ended = True
 
     def get_winner(self):
+        """
+        Get the winner(s) of the game.
+
+        :return: a player if won, "both" if game ended in a draw.
+        """
         if len(self.board.players[0].storage.inventory) > len(self.board.players[1].storage.inventory):
             return self.board.players[0]
         elif len(self.board.players[0].storage.inventory) < len(self.board.players[1].storage.inventory):
@@ -49,13 +61,25 @@ class Logic:
             return "both"
 
     def capture(self):
+        """
+        Capture enemy pieces.
+
+        :return: True if pieces captured.
+        """
         if len(self.last_cell.inventory) == 1 and not self.last_cell.is_storage:
-            if self.transfer_pieces(self.opposite_cell(self.last_cell), self.active_player.storage):
-                self.hint2 = self.active_player.name + " captured opponent's pieces"
-                return True
+            if self.opposite_cell(self.last_cell) not in self.active_player.allowed:
+                if self.transfer_pieces(self.opposite_cell(self.last_cell), self.active_player.storage):
+                    self.hint2 = self.active_player.name + " captured opponent's pieces"
+                    return True
         return False
 
     def opposite_cell(self, cell):
+        """
+        Get the cell from the opposite row.
+
+        :param cell: the cell whose opposite is needed.
+        :return: cell with the same position, but from the other row.
+        """
         if cell.cell_type == "upper":
             opposite = self.board.cells[3][int(cell.order)]
         else:
@@ -64,6 +88,13 @@ class Logic:
 
     @staticmethod
     def transfer_pieces(cell1, cell2):
+        """
+        Transfer the pieces from a cell, to another.
+
+        :param cell1: from
+        :param cell2: to
+        :return: True if transfer took place.
+        """
         if cell1.inventory:
             while cell1.inventory:
                 cell2.add_n_pieces(1)
@@ -109,6 +140,11 @@ class Logic:
             next1, next2 = self.next_in_order(actual_i, actual_j)
             actual_i, actual_j = next1, next2
             self.add_piece_to(actual_i, actual_j)
+
+            sleep(0.1)
+            self.board.draw_board()
+            pygame.display.update()
+
             self.board.cells[i][j].remove_piece()
             self.move_made = True
         if actual_i == 0 or actual_i == 1:
