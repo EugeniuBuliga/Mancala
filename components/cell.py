@@ -46,8 +46,11 @@ class Cell:
     def __str__(self):
         func1 = (lambda x: "Storage" if x else "Cell")
         func2 = (lambda x: self.order if not x else "S")
-        message = func1(self.is_storage) + "<" + self.cell_type + "-" + func2(self.is_storage) + ">,"
+        message = func1(self.is_storage) + "<" + self.cell_type + "-" + func2(self.is_storage) + ">"
         return message
+
+    def __repr__(self):
+        return self.__str__()
 
     def draw_cell(self):
         """

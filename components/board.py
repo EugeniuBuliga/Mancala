@@ -1,5 +1,6 @@
 import pygame
 
+from logic.player import Player
 from .cell import Cell
 from .options import *
 
@@ -10,6 +11,7 @@ class Board:
 
         self.cells = []
         self.selected_region = None
+        self.players = []
 
     def __str__(self):
         message = str(self.cells[0]) + str(self.cells[1]) + "\n["
@@ -20,6 +22,12 @@ class Board:
             message += str(cell)
         message += "]"
         return message
+
+    def add_default_players(self):
+        player1 = Player(self, "Player1", "up")
+        self.players.append(player1)
+        player2 = Player(self, "Player2", "down")
+        self.players.append(player2)
 
     def init_board(self):
         """
@@ -39,6 +47,8 @@ class Board:
         for i in range(6):
             lower_row.append(Cell(self.screen, "lower", False, str(i)))
         self.cells.append(lower_row)
+
+        self.add_default_players()
 
     def draw_board(self):
         """
