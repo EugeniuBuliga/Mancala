@@ -141,7 +141,7 @@ class Cell:
         :param y: coords y
         :return: True/False
         """
-        if self.x <= x <= self.x + CELL_WIDTH and self.y <= y <= self.y + CELL_HEIGHT:
+        if self.x < x < self.x + CELL_WIDTH and self.y < y < self.y + CELL_HEIGHT:
             self.is_selected = True
             return True
         else:
