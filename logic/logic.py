@@ -7,7 +7,9 @@ class Logic:
         self.active_player = board.players[0]
         self.move_made = False
         self.ended_move_on_piece = False
-        self.hint = self.active_player.name + " start the game"
+        self.hint1 = self.active_player.name + " start the game"
+        self.hint2 = ""
+        self.last_cell = board.cells[0]
 
     def movement_logic(self):
         """
@@ -19,7 +21,28 @@ class Logic:
                 if self.board.cells[i][j].is_on_cell(x, y):
                     if self.is_players_cell(self.board.cells[i][j]):
                         self.make_move(i, j)
-                        self.move_made = True
+                        if not self.capture():
+                            self.hint2 = ""
+
+    def capture(self):
+        if len(self.last_cell.inventory) == 1 and not self.last_cell.is_storage:
+            self.transfer_pieces(self.opposite_cell(self.last_cell), self.active_player.storage)
+            self.hint2 = self.active_player.name + " captured opponent's pieces"
+            return True
+        return False
+
+    def opposite_cell(self, cell):
+        if cell.cell_type == "upper":
+            opposite = self.board.cells[3][int(cell.order)]
+        else:
+            opposite = self.board.cells[2][int(cell.order)]
+        return opposite
+
+    @staticmethod
+    def transfer_pieces(cell1, cell2):
+        while cell1.inventory:
+            cell2.add_n_pieces(1)
+            cell1.remove_piece()
 
     @staticmethod
     def next_in_order(i, j):
@@ -59,8 +82,12 @@ class Logic:
             actual_i, actual_j = next1, next2
             self.add_piece_to(actual_i, actual_j)
             self.board.cells[i][j].remove_piece()
+            self.move_made = True
         if actual_i == 0 or actual_i == 1:
             self.ended_move_on_piece = True
+            self.last_cell = self.board.cells[actual_i]
+        else:
+            self.last_cell = self.board.cells[actual_i][actual_j]
 
     def add_piece_to(self, n1, n2):
         """
@@ -83,7 +110,7 @@ class Logic:
                 self.active_player = self.board.players[1]
             else:
                 self.active_player = self.board.players[0]
-            self.hint = self.active_player.name + "'s turn"
+            self.hint1 = self.active_player.name + "'s turn"
         else:
             self.ended_move_on_piece = False
 

@@ -51,4 +51,5 @@ def draw_hint(screen, logic):
     :param screen: Screen open which to draw the text.
     :param logic: Game logic, that controls flow of the game.
     """
-    draw_text(screen, SCORE_TEXT_COLOR, logic.hint, HINT_POS)
+    draw_text(screen, SCORE_TEXT_COLOR, logic.hint1, HINT1_POS)
+    draw_text(screen, SCORE_TEXT_COLOR, logic.hint2, HINT2_POS)
