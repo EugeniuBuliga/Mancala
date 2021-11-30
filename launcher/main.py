@@ -9,6 +9,7 @@ if __name__ == '__main__':
     window = init_game()
     board = init_board(window)
     logic = Logic(board)
+    logic.set_ai_opponent()
 
     clock = pygame.time.Clock()
     run = True
@@ -27,6 +28,8 @@ if __name__ == '__main__':
                 if logic.move_made:
                     logic.next_player()
                     logic.move_made = False
+
+
 
         # graphics
         pygame.draw.rect(window, BACKGROUND_COLOR, (0, 0, WIDTH, HEIGHT))

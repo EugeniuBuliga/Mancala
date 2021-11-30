@@ -2,6 +2,8 @@ from time import sleep
 
 import pygame
 
+from logic.ailogic import Ai
+
 
 class Logic:
     def __init__(self, board):
@@ -14,13 +16,27 @@ class Logic:
         self.last_cell = board.cells[0]
         self.ended = False
 
+
+    #     self.opponent_is_ai = False
+    #     self.ai = None
+    # def set_ai_opponent(self):
+    #     self.opponent_is_ai = True
+    #     self.ai = Ai(self.board)
+
+
     def movement_logic(self):
         """
         Keeps track of all the actions regarding gameplay.
         """
         for i in [2, 3]:
             for j in range(0, 6):
-                (x, y) = pygame.mouse.get_pos()
+                # if not self.opponent_is_ai:
+                #     (x, y) = pygame.mouse.get_pos()
+                # elif self.opponent_is_ai and self.active_player.get_storage() == 1:
+                #     (x, y) = pygame.mouse.get_pos()
+                # else:
+                #     (x, y) = self.ai.ai_get_move(i, j)
+
                 if self.board.cells[i][j].is_on_cell(x, y):
                     if self.is_players_cell(self.board.cells[i][j]):
                         self.make_move(i, j)
@@ -148,11 +164,9 @@ class Logic:
             self.board.cells[i][j].remove_piece()
             self.move_made = True
         if actual_i == 0 == self.active_player.get_storage() or actual_i == 1 == self.active_player.get_storage():
-            print(self.active_player.get_storage())
             self.ended_move_on_piece = True
             self.last_cell = self.board.cells[actual_i]
         elif actual_i == 0 or actual_i == 1:
-            print(self.active_player.get_storage())
             self.last_cell = self.board.cells[actual_i]
         else:
             self.last_cell = self.board.cells[actual_i][actual_j]
