@@ -155,6 +155,8 @@ class Logic:
         actual_j = j
         while self.board.cells[i][j].inventory:
             next1, next2 = self.next_in_order(actual_i, actual_j)
+            if next1 != self.active_player.get_storage() and next2 == -9:
+                next1, next2 = self.next_in_order(next1, next2)
             actual_i, actual_j = next1, next2
             self.add_piece_to(actual_i, actual_j)
 
@@ -196,7 +198,8 @@ class Logic:
             self.hint1 = self.active_player.name + "'s turn"
         else:
             self.ended_move_on_piece = False
-            self.ai.allow_move()
+            if self.opponent_is_ai:
+                self.ai.allow_move()
 
     def is_players_cell(self, cell):
         """
