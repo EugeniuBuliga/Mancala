@@ -160,6 +160,12 @@ class Cell:
             self.is_selected = False
             return False
 
+    def clear_selection(self):
+        """
+        Unselect selected cell. (removes selected border)
+        """
+        self.is_selected = False
+
     def is_empty(self):
         """
         Check if cell has no pieces.

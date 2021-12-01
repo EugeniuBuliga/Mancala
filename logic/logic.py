@@ -47,6 +47,7 @@ class Logic:
                         self.make_move(i, j)
                         if not self.capture():
                             self.hint2 = ""
+                self.board.cells[i][j].clear_selection()
                 self.check_win_state(i)
 
     def check_win_state(self, i):
