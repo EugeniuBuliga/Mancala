@@ -21,6 +21,10 @@ class Logic:
         self.ai = None
 
     def set_ai_opponent(self):
+        """
+        Initializes the AI components.
+        """
+
         self.opponent_is_ai = True
         self.ai = Ai(self.board)
 

@@ -8,8 +8,8 @@ This file contains all constants used in the application.
 WIDTH = 800
 HEIGHT = 600
 
-# graphics
-FPS = 60
+# text
+FONT = 'freesansbold.ttf'
 
 # colors
 RAND_COLOR = (rand.randint(1, 255), rand.randint(1, 255), rand.randint(1, 255))
@@ -19,6 +19,7 @@ BORDER_COLOR = (50, 30, 0)
 SELECTED_BORDER_COLOR = (247, 247, 57)
 PIECE_COLOR = (210, 105, 30)
 PIECE_OUTLINE_COLOR = (128, 0, 0)
+SCORE_TEXT_COLOR = (255, 255, 200)
 
 # dimensions
 CENTER = WIDTH / 2, HEIGHT / 2
@@ -37,9 +38,8 @@ STORAGE_HEIGHT = HEIGHT / 2  # 300
 CELL_PADDING = BORDER_SIDE + STORAGE_WIDTH
 CELL_BORDER_WIDTH = 1
 
-INITIAL_PIECES_NR = 10
+INITIAL_PIECES_NR = 4
 
-SCORE_TEXT_COLOR = (255, 255, 200)
 SCORE_POS = WIDTH / 2, HEIGHT / 8
 TEMP_TEXT = WIDTH / 2, HEIGHT / 8
 

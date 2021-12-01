@@ -5,13 +5,20 @@ from components.initialization import init_game, init_board
 from components.options import *
 from logic.logic import Logic
 
-if __name__ == '__main__':
+
+def play_game(opponent):
+    """
+    Main game function.
+
+    :param opponent: type of opponent ('ai' or 'pvp')
+    """
+
     window = init_game()
     board = init_board(window)
     logic = Logic(board)
-    #logic.set_ai_opponent()
+    if opponent == "ai":
+        logic.set_ai_opponent()
 
-    clock = pygame.time.Clock()
     run = True
 
     while run:
@@ -32,9 +39,7 @@ if __name__ == '__main__':
                 if logic.opponent_is_ai:
                     logic.ai.update_ai_moves()
 
-
-
-        # graphics
+        # graphics (screen updates)
         pygame.draw.rect(window, BACKGROUND_COLOR, (0, 0, WIDTH, HEIGHT))
         board.draw_board()
         draw_players(window, board)

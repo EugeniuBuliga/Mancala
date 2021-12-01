@@ -2,7 +2,7 @@ import pygame
 from components.options import *
 
 
-def draw_text(screen, color, text, center, font='freesansbold.ttf'):
+def draw_text(screen, color, text, center, font=FONT):
     """
     Write a text on given coordinates.
 

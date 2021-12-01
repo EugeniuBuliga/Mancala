@@ -14,6 +14,11 @@ class Player:
         return self.__str__()
 
     def get_storage(self):
+        """
+        Get the storage number of the player (0 = right, 1 = left)
+
+        :return: 0 or 1
+        """
         return self.storage_num
 
     def get_allowed_cells(self):
