@@ -28,6 +28,7 @@ if __name__ == '__main__':
                 if logic.move_made:
                     logic.next_player()
                     logic.move_made = False
+                logic.ai.update_ai_moves()
 
 
 

@@ -2,6 +2,7 @@ from time import sleep
 
 import pygame
 
+from components.options import SLEEP_ANIMATION_TIME
 from logic.ailogic import Ai
 
 
@@ -16,13 +17,12 @@ class Logic:
         self.last_cell = board.cells[0]
         self.ended = False
 
+        self.opponent_is_ai = False
+        self.ai = None
 
-    #     self.opponent_is_ai = False
-    #     self.ai = None
-    # def set_ai_opponent(self):
-    #     self.opponent_is_ai = True
-    #     self.ai = Ai(self.board)
-
+    def set_ai_opponent(self):
+        self.opponent_is_ai = True
+        self.ai = Ai(self.board)
 
     def movement_logic(self):
         """
@@ -30,12 +30,13 @@ class Logic:
         """
         for i in [2, 3]:
             for j in range(0, 6):
-                # if not self.opponent_is_ai:
-                #     (x, y) = pygame.mouse.get_pos()
-                # elif self.opponent_is_ai and self.active_player.get_storage() == 1:
-                #     (x, y) = pygame.mouse.get_pos()
-                # else:
-                #     (x, y) = self.ai.ai_get_move(i, j)
+
+                if not self.opponent_is_ai:
+                    (x, y) = pygame.mouse.get_pos()
+                elif self.opponent_is_ai and self.active_player.get_storage() == 1:
+                    (x, y) = pygame.mouse.get_pos()
+                else:
+                    (x, y) = self.ai.get_ai_move()
 
                 if self.board.cells[i][j].is_on_cell(x, y):
                     if self.is_players_cell(self.board.cells[i][j]):
@@ -157,7 +158,7 @@ class Logic:
             actual_i, actual_j = next1, next2
             self.add_piece_to(actual_i, actual_j)
 
-            sleep(0.1)
+            sleep(SLEEP_ANIMATION_TIME)
             self.board.draw_board()
             pygame.display.update()
 
@@ -195,6 +196,7 @@ class Logic:
             self.hint1 = self.active_player.name + "'s turn"
         else:
             self.ended_move_on_piece = False
+            self.ai.allow_move()
 
     def is_players_cell(self, cell):
         """

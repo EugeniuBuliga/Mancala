@@ -5,23 +5,38 @@ import random as rand
 class Ai:
     def __init__(self, board):
         self.board = board
-        self.available_moves = self.ai_set_moves()
-        self.actual = -1, -1
-        self.move = None
+        self.available_moves = self.update_ai_moves()
+        self.move_allowed = False
+        self.move = rand.choice(self.available_moves)
 
-    def ai_set_moves(self):
+    def allow_move(self):
+        self.move_allowed = True
+
+    def update_ai_moves(self):
+        self.clear_moves()
         available_moves = []
         for cell in self.board.cells[2]:
             if not cell.is_empty():
                 x = cell.x + CELL_WIDTH / 2
                 y = cell.y + CELL_HEIGHT / 2
                 available_moves.append([x, y])
-        return available_moves
+        if not hasattr(self, 'available_moves'):
+            return available_moves
+        else:
+            self.available_moves = available_moves
+            self.move_allowed = True
 
-    def ai_get_move(self, i, j):
-        if [i, j] != self.actual:
+
+    def clear_moves(self):
+        if hasattr(self, 'available_moves'):
+            self.available_moves.clear()
+
+    def get_ai_move(self):
+        if self.move_allowed:
+            self.update_ai_moves()
             self.move = rand.choice(self.available_moves)
-            self.actual = [i, j]
+            print(self.move)
+            self.move_allowed = False
             return self.move
         else:
             return self.move
