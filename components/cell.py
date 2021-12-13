@@ -1,10 +1,11 @@
 import pygame
+from pygame.surface import Surface
 from components.options import *
 from components.piece import Piece
 
 
 class Cell:
-    def __init__(self, screen, cell_type, is_storage="False", order="1"):
+    def __init__(self, screen: Surface, cell_type: str, is_storage="False", order="1"):
         self.screen = screen
         self.cell_type = cell_type
         self.is_storage = is_storage
@@ -16,7 +17,16 @@ class Cell:
         self.x, self.y = self.set_x_and_y()
         self.border_color, self.cell_border_width = self.set_colors_and_borders()
 
-    def set_x_and_y(self):
+    def __str__(self) -> str:
+        func1 = (lambda x: "Storage" if x else "Cell")
+        func2 = (lambda x: self.order if not x else "S")
+        message = func1(self.is_storage) + "<" + self.cell_type + "-" + func2(self.is_storage) + ">"
+        return message
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def set_x_and_y(self) -> (int, int):
         """
         Sets cells x and y coordinates based on its type.
 
@@ -37,7 +47,7 @@ class Cell:
                 y = BORDER_UPPER + CELL_HEIGHT
         return x, y
 
-    def set_colors_and_borders(self):
+    def set_colors_and_borders(self) -> ((int, int, int), int):
         """
         Set the colors and thickness of the borders, based on the fact that cell is selected or not.
 
@@ -51,15 +61,6 @@ class Cell:
             border_color = BORDER_COLOR
             cell_border_width = CELL_BORDER_WIDTH
         return border_color, cell_border_width
-
-    def __str__(self):
-        func1 = (lambda x: "Storage" if x else "Cell")
-        func2 = (lambda x: self.order if not x else "S")
-        message = func1(self.is_storage) + "<" + self.cell_type + "-" + func2(self.is_storage) + ">"
-        return message
-
-    def __repr__(self):
-        return self.__str__()
 
     def draw_cell(self):
         """
@@ -102,7 +103,7 @@ class Cell:
 
             pygame.draw.rect(self.screen, CELL_COLOR, cell)
 
-    def remove_piece(self):
+    def remove_piece(self) -> bool:
         """
         Removes one piece from this cell's inventory.
 
@@ -135,7 +136,7 @@ class Cell:
                 i = 1
                 j += 1
 
-    def add_n_pieces(self, n):
+    def add_n_pieces(self, n: int):
         """
         Adds to a cell's inventory the n amount of pieces.
 
@@ -145,7 +146,7 @@ class Cell:
             piece = Piece(self.screen)
             self.inventory.append(piece)
 
-    def is_on_cell(self, x, y):
+    def is_on_cell(self, x: int, y: int) -> bool:
         """
         Checks if coordinates are inside a specific cell's borders.
 
@@ -166,7 +167,7 @@ class Cell:
         """
         self.is_selected = False
 
-    def is_empty(self):
+    def is_empty(self) -> bool:
         """
         Check if cell has no pieces.
 

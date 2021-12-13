@@ -1,36 +1,33 @@
 import pygame
-from components.board import *
 from components.graphics import draw_score, draw_players, draw_hint
 from components.initialization import init_game, init_board
 from components.options import *
 from logic.logic import Logic
 
 
-def play_game(opponent):
+def play_game(opponent: str):
     """
     Main game function.
 
     :param opponent: type of opponent ('ai' or 'pvp')
     """
 
+    # initialization of main game components and variables
     window = init_game()
     board = init_board(window)
     logic = Logic(board)
     if opponent == "ai":
         logic.set_ai_opponent()
-
     run = True
 
+    # main game loop
     while run:
+        # check for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
-            if event.type == pygame.MOUSEMOTION:
-                pass
-
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # print(board)
                 logic.movement_logic()
                 if logic.move_made:
                     logic.next_player()

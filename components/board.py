@@ -1,17 +1,19 @@
+from pygame.surface import Surface
+
 from logic.player import Player
 from .cell import Cell
-from .options import *
+from .options import INITIAL_PIECES_NR
 
 
 class Board:
-    def __init__(self, screen):
+    def __init__(self, screen: Surface):
         self.screen = screen
 
         self.cells = []
         self.selected_region = None
         self.players = []
 
-    def __str__(self):
+    def __str__(self) -> str:
         message = str(self.cells[0]) + str(self.cells[1]) + "\n["
         for cell in self.cells[2]:
             message += str(cell)

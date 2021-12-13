@@ -13,7 +13,7 @@ class Player:
     def __repr__(self):
         return self.__str__()
 
-    def get_storage(self):
+    def get_storage(self) -> int:
         """
         Get the storage number of the player (0 = right, 1 = left)
 
@@ -21,7 +21,7 @@ class Player:
         """
         return self.storage_num
 
-    def get_allowed_cells(self):
+    def get_allowed_cells(self) -> (int, list):
         """
         Sets the list of cells upon which the player can click, plus the respective storage.
 

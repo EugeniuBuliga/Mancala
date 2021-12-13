@@ -1,8 +1,11 @@
 import pygame
+from pygame.surface import Surface
+from components.board import Board
 from components.options import *
+from logic.logic import Logic
 
 
-def draw_text(screen, color, text, center, font=FONT):
+def draw_text(screen: Surface, color: (int, int, int), text: str, center: (int, int), font=FONT):
     """
     Write a text on given coordinates.
 
@@ -20,7 +23,7 @@ def draw_text(screen, color, text, center, font=FONT):
     screen.blit(text, text_rect)
 
 
-def draw_score(screen, board):
+def draw_score(screen: Surface, board: Board):
     """
     Draws the score of both players on proper place on the screen.
 
@@ -32,7 +35,7 @@ def draw_score(screen, board):
     draw_text(screen, SCORE_TEXT_COLOR, score_player1 + ":" + score_player2, SCORE_POS)
 
 
-def draw_players(screen, board):
+def draw_players(screen: Surface, board: Board):
     """
     Draws players' names on screen.
 
@@ -43,7 +46,7 @@ def draw_players(screen, board):
     draw_text(screen, SCORE_TEXT_COLOR, board.players[0].name, PLAYER2_POS)
 
 
-def draw_hint(screen, logic):
+def draw_hint(screen: Surface, logic: Logic):
     """
     Draw hints regarding gameplay in the bottom of the screen.
 

@@ -4,11 +4,11 @@ import random as rand
 This file contains all constants used in the application.  
 """
 
-# window
+# window size
 WIDTH = 800
 HEIGHT = 600
 
-# text
+# text font
 FONT = 'freesansbold.ttf'
 
 # colors
@@ -21,7 +21,7 @@ PIECE_COLOR = (210, 105, 30)
 PIECE_OUTLINE_COLOR = (128, 0, 0)
 SCORE_TEXT_COLOR = (255, 255, 200)
 
-# dimensions
+# graphic elements dimensions and positions
 CENTER = WIDTH / 2, HEIGHT / 2
 BORDER_UPPER = HEIGHT / 4  # 150
 BORDER_SIDE = (WIDTH - 9 * int(WIDTH / 9)) / 2  # 4
@@ -40,6 +40,7 @@ CELL_BORDER_WIDTH = 1
 
 INITIAL_PIECES_NR = 4
 
+# text position
 SCORE_POS = WIDTH / 2, HEIGHT / 8
 TEMP_TEXT = WIDTH / 2, HEIGHT / 8
 
@@ -49,4 +50,5 @@ PLAYER2_POS = WIDTH / 8 * 7, HEIGHT / 8
 HINT1_POS = WIDTH / 2, HEIGHT / 8 * 7
 HINT2_POS = WIDTH / 2, HEIGHT / 8 * 7.5
 
+# animation parameters
 SLEEP_ANIMATION_TIME = 0.2
