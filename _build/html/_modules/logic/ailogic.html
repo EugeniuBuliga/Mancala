@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>logic.ailogic &#8212; Mancala v1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for logic.ailogic</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">components.board</span> <span class="kn">import</span> <span class="n">Board</span>
+<span class="kn">from</span> <span class="nn">components.options</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">random</span> <span class="k">as</span> <span class="nn">rand</span>
+
+
+<div class="viewcode-block" id="Ai"><a class="viewcode-back" href="../../docs/logic.html#logic.ailogic.Ai">[docs]</a><span class="k">class</span> <span class="nc">Ai</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">:</span> <span class="n">Board</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">board</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_moves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_ai_moves</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_allowed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="n">rand</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_moves</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Ai.allow_move"><a class="viewcode-back" href="../../docs/logic.html#logic.ailogic.Ai.allow_move">[docs]</a>    <span class="k">def</span> <span class="nf">allow_move</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows AI to make next move.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_allowed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Ai.clear_moves"><a class="viewcode-back" href="../../docs/logic.html#logic.ailogic.Ai.clear_moves">[docs]</a>    <span class="k">def</span> <span class="nf">clear_moves</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all the moves from the available_moves attribute, if it is not empty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;available_moves&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">available_moves</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Ai.update_ai_moves"><a class="viewcode-back" href="../../docs/logic.html#logic.ailogic.Ai.update_ai_moves">[docs]</a>    <span class="k">def</span> <span class="nf">update_ai_moves</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the list of available moves, based on the cells that are not empty.</span>
+
+<span class="sd">        :return: available_moves list attribute, if it has not been initialized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_moves</span><span class="p">()</span>
+        <span class="n">available_moves</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cell</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">CELL_WIDTH</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">CELL_HEIGHT</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">available_moves</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;available_moves&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">available_moves</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">available_moves</span> <span class="o">=</span> <span class="n">available_moves</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_allowed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Ai.get_ai_move"><a class="viewcode-back" href="../../docs/logic.html#logic.ailogic.Ai.get_ai_move">[docs]</a>    <span class="k">def</span> <span class="nf">get_ai_move</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get AI&#39;s next move if movement allowed, or the already chosen move, if movement restricted.</span>
+
+<span class="sd">        :return: AI&#39;s next move.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">move_allowed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_ai_moves</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_moves</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="n">rand</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_moves</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_allowed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">move</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">move</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Mancala</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Eugeniu Buliga.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

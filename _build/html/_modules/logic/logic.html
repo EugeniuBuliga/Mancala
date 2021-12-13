@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>logic.logic &#8212; Mancala v1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for logic.logic</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pygame</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">components.board</span> <span class="kn">import</span> <span class="n">Board</span>
+<span class="kn">from</span> <span class="nn">components.cell</span> <span class="kn">import</span> <span class="n">Cell</span>
+<span class="kn">from</span> <span class="nn">components.options</span> <span class="kn">import</span> <span class="n">SLEEP_ANIMATION_TIME</span>
+<span class="kn">from</span> <span class="nn">logic.ailogic</span> <span class="kn">import</span> <span class="n">Ai</span>
+<span class="kn">from</span> <span class="nn">logic.player</span> <span class="kn">import</span> <span class="n">Player</span>
+
+
+<div class="viewcode-block" id="Logic"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic">[docs]</a><span class="k">class</span> <span class="nc">Logic</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">:</span> <span class="n">Board</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">board</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_made</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ended_move_on_piece</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hint1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;&#39;s turn&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hint2</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ended</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">opponent_is_ai</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ai</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Logic.transfer_pieces"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.transfer_pieces">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">transfer_pieces</span><span class="p">(</span><span class="n">cell1</span><span class="p">:</span> <span class="n">Cell</span><span class="p">,</span> <span class="n">cell2</span><span class="p">:</span> <span class="n">Cell</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transfer the pieces from a cell, to another.</span>
+
+<span class="sd">        :param cell1: from</span>
+<span class="sd">        :param cell2: to</span>
+<span class="sd">        :return: True if transfer took place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cell1</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">cell1</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
+                <span class="n">cell2</span><span class="o">.</span><span class="n">add_n_pieces</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">cell1</span><span class="o">.</span><span class="n">remove_piece</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Logic.next_in_order"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.next_in_order">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">next_in_order</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gives the next cell in order of the game.</span>
+
+<span class="sd">        :param i: i position in cells list (2 = up, 3 = down)</span>
+<span class="sd">        :param j: j position in row</span>
+<span class="sd">        :return: The next cells coordinates in cells list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">9</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">9</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span></div>
+
+<div class="viewcode-block" id="Logic.set_ai_opponent"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.set_ai_opponent">[docs]</a>    <span class="k">def</span> <span class="nf">set_ai_opponent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the AI components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">opponent_is_ai</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ai</span> <span class="o">=</span> <span class="n">Ai</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logic.opposite_cell"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.opposite_cell">[docs]</a>    <span class="k">def</span> <span class="nf">opposite_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell</span><span class="p">:</span> <span class="n">Cell</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Cell</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the cell from the opposite row.</span>
+
+<span class="sd">        :param cell: the cell whose opposite is needed.</span>
+<span class="sd">        :return: cell with the same position, but from the other row.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cell</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span>
+            <span class="n">opposite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">order</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">opposite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">order</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">opposite</span></div>
+
+<div class="viewcode-block" id="Logic.get_winner"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.get_winner">[docs]</a>    <span class="k">def</span> <span class="nf">get_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">Player</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the winner(s) of the game.</span>
+
+<span class="sd">        :return: a player if won, &quot;both&quot; if game ended in a draw.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inventory</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inventory</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inventory</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inventory</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;both&quot;</span></div>
+
+<div class="viewcode-block" id="Logic.check_win_state"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.check_win_state">[docs]</a>    <span class="k">def</span> <span class="nf">check_win_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the game was won and sends the print message to &#39;hint2&#39;.</span>
+
+<span class="sd">        :param i: row</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">empty_nr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+                <span class="n">empty_nr</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">empty_nr</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">winner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_winner</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">winner</span> <span class="o">!=</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hint2</span> <span class="o">=</span> <span class="s2">&quot;Game ended: &quot;</span> <span class="o">+</span> <span class="n">winner</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; won!&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hint2</span> <span class="o">=</span> <span class="s2">&quot;Game ended: &quot;</span> <span class="o">+</span> <span class="s2">&quot;Ended in a draw!&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ended</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Logic.is_players_cell"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.is_players_cell">[docs]</a>    <span class="k">def</span> <span class="nf">is_players_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell</span><span class="p">:</span> <span class="n">Cell</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines whether the cell belongs to the active_player or not.</span>
+
+<span class="sd">        :param cell: the cell whose appartenance needs to be checked.</span>
+<span class="sd">        :return: True if active_player can click it, False if not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cell</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Logic.add_piece_to"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.add_piece_to">[docs]</a>    <span class="k">def</span> <span class="nf">add_piece_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n2</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ads pieces to the cell, according to its type (derived from the two input parameters)</span>
+
+<span class="sd">        :param n1: position in cells list</span>
+<span class="sd">        :param n2: position in cells list (if ==-9, then it&#39;s a storage, not a cell, so it&#39;s not taken into account)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">n2</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">9</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">]</span><span class="o">.</span><span class="n">add_n_pieces</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">n1</span><span class="p">]</span><span class="o">.</span><span class="n">add_n_pieces</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logic.make_move"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.make_move">[docs]</a>    <span class="k">def</span> <span class="nf">make_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs movement of the pieces on the board, on the cell specified.</span>
+
+<span class="sd">        :param i: i position in cells list (2 = up, 3 = down)</span>
+<span class="sd">        :param j: j position in row</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">actual_i</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">actual_j</span> <span class="o">=</span> <span class="n">j</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
+            <span class="n">next1</span><span class="p">,</span> <span class="n">next2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_in_order</span><span class="p">(</span><span class="n">actual_i</span><span class="p">,</span> <span class="n">actual_j</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">next1</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">get_storage</span><span class="p">()</span> <span class="ow">and</span> <span class="n">next2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">9</span><span class="p">:</span>
+                <span class="n">next1</span><span class="p">,</span> <span class="n">next2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_in_order</span><span class="p">(</span><span class="n">next1</span><span class="p">,</span> <span class="n">next2</span><span class="p">)</span>
+            <span class="n">actual_i</span><span class="p">,</span> <span class="n">actual_j</span> <span class="o">=</span> <span class="n">next1</span><span class="p">,</span> <span class="n">next2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_piece_to</span><span class="p">(</span><span class="n">actual_i</span><span class="p">,</span> <span class="n">actual_j</span><span class="p">)</span>
+
+            <span class="n">sleep</span><span class="p">(</span><span class="n">SLEEP_ANIMATION_TIME</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">()</span>
+            <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">remove_piece</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_made</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">actual_i</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">get_storage</span><span class="p">()</span> <span class="ow">or</span> <span class="n">actual_i</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">get_storage</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ended_move_on_piece</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">actual_i</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">actual_i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">actual_i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">actual_i</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">actual_i</span><span class="p">][</span><span class="n">actual_j</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Logic.capture"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.capture">[docs]</a>    <span class="k">def</span> <span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Capture enemy pieces.</span>
+
+<span class="sd">        :return: True if pieces captured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span><span class="o">.</span><span class="n">inventory</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span><span class="o">.</span><span class="n">is_storage</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opposite_cell</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opposite_cell</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_cell</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">storage</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hint2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; captured opponent&#39;s pieces&quot;</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Logic.movement_logic"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.movement_logic">[docs]</a>    <span class="k">def</span> <span class="nf">movement_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Keeps track of all the actions regarding gameplay.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">opponent_is_ai</span><span class="p">:</span>
+                    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">mouse</span><span class="o">.</span><span class="n">get_pos</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">opponent_is_ai</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">get_storage</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">mouse</span><span class="o">.</span><span class="n">get_pos</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ai</span><span class="o">.</span><span class="n">get_ai_move</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">is_on_cell</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_players_cell</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">make_move</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture</span><span class="p">():</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">hint2</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_win_state</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logic.next_player"><a class="viewcode-back" href="../../docs/logic.html#logic.logic.Logic.next_player">[docs]</a>    <span class="k">def</span> <span class="nf">next_player</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines who is the next player to make a move.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ended_move_on_piece</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hint1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_player</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;&#39;s turn&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ended_move_on_piece</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opponent_is_ai</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ai</span><span class="o">.</span><span class="n">allow_move</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Mancala</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Eugeniu Buliga.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
